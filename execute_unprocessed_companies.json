@@ -1,0 +1,339 @@
+{
+  "name": "execute_unprocessed_companies",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"count\": 0,\n  \"companies\": [{}]\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "0aeb9540-19a0-4d26-941e-1bd2d9628393",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.4c.tec.br/api/v1/cards/48fbb126-0129-42c4-824d-97d5511a3330/0375d939-66fb-4b46-9514-4a0b787d3d00/store",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n    \"Content-Type\": \"application/json\",\n    \"User-Agent\": \"Ikasa-Leads-Automation/1.0\",\n    \"X-User-Uuid\": \"4fafa546-b286-49c8-9115-0634c9c9de9d\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"title\": \"{{ $node[\"formated_return\"].json.business.name }}\",\n    \"value\": \"0.00\",\n    \"customerUuid\": \"{{ $node[\"formated_return\"].json.business.uuidBusiness }}\",\n    \"responsibleUuid\": \"4fafa546-b286-49c8-9115-0634c9c9de9d\",\n    \"origin\": \"AUTOMAÇÃO\",\n    \"indicatedBy\": \"\",\n    \"sdr\": \"\",\n    \"temperature\": \"FRIO\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        -64
+      ],
+      "id": "2fd1e233-1c98-4ead-a31e-606f9ba0aacd",
+      "name": "add_funnel_4c",
+      "notesInFlow": false,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "Z9UsIgI0GgvHAnOX",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1c64b98a-a0f0-43e0-8836-33a6ed879b70",
+              "leftValue": "={{ $json.crmStatus.saved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        16
+      ],
+      "id": "e995dbd2-d1da-4f70-a1ab-d2a7a99264fb",
+      "name": "crm_status_is_saved"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xicfmqxtokulltxjusty.supabase.co/rest/v1/rpc/update_crm_status",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apiKey\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpY2ZtcXh0b2t1bGx0eGp1c3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyNTQzMzMsImV4cCI6MjA3ODgzMDMzM30.g-qYCypHUN7JIzwDefM76hS4QxJ-stoknHlmiAkz0kA\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_document\": {{ $node[\"formated_return\"].json.business.document }},\n  \"p_saved\": true,\n  \"p_added_funnel\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        848,
+        -64
+      ],
+      "id": "1533d988-111b-4fc8-8252-983fca16752c",
+      "name": "update_db_crm_status_added_funnel",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "sE3MG95WRusfmDcb",
+          "name": "Bearer Auth Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn $input.first().json.companies ?? {};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        16
+      ],
+      "id": "bb96a470-e4ca-4cb6-9146-7bc2ce6002b5",
+      "name": "formated_return"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b25b7089-2e03-4d3d-b714-3e8e55d2e8bc",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "3598504e-fa0d-423f-8a39-da09039e6d4e",
+      "name": "items_count_equal_zero"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.4c.tec.br/api/v1/customers/store",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n    \"Content-Type\": \"application/json\",\n    \"User-Agent\": \"Ikasa-Leads-Automation/1.0\",\n    \"X-User-Uuid\": \"4fafa546-b286-49c8-9115-0634c9c9de9d\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $node[\"formated_return\"].json.name }}\",\n  \"email\": \"{{ $node[\"formated_return\"].json.email }}\",\n  \"cellphone\": \"{{ $node[\"formated_return\"].json.cellphone }}\",\n  \"isLead\": 1,\n  \"business\": {\n    \"name\": \"{{ $node[\"formated_return\"].json.business.name }}\",\n    \"document\": \"{{ $node[\"formated_return\"].json.business.document }}\",\n    \"initialDateRecurrence\": \"{{ $node[\"formated_return\"].json.business.initialDateRecurrence }}\",\n    \"taxRegime\": \"SIMPLES NACIONAL\",\n    \"address\": {\n      \"zipCode\": \"{{ $node[\"formated_return\"].json.business.address.zipCode }}\",\n      \"street\": \"{{ $node[\"formated_return\"].json.business.address.street }}\",\n      \"number\": \"{{ $node[\"formated_return\"].json.business.address.number }}\",\n      \"district\": \"{{ $node[\"formated_return\"].json.business.address.district }}\",\n      \"city\": \"{{ $node[\"formated_return\"].json.business.address.city }}\",\n      \"uf\": \"{{ $node[\"formated_return\"].json.business.address.uf }}\"\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        128
+      ],
+      "id": "0900324c-067a-441d-9463-d60cc52dc251",
+      "name": "save_customer_4c",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "Z9UsIgI0GgvHAnOX",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xicfmqxtokulltxjusty.supabase.co/rest/v1/rpc/update_crm_status",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apiKey\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpY2ZtcXh0b2t1bGx0eGp1c3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyNTQzMzMsImV4cCI6MjA3ODgzMDMzM30.g-qYCypHUN7JIzwDefM76hS4QxJ-stoknHlmiAkz0kA\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_document\": \"{{ $node[\"formated_return\"].json.business.document }}\",\n  \"p_saved\": true,\n  \"p_added_funnel\": false,\n  \"p_uuid_business\": \"{{ $json.data.uuid }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        864,
+        128
+      ],
+      "id": "6091a3f7-7722-43d6-9054-c4c5da484ee0",
+      "name": "update_db_crm_status_saved",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "sE3MG95WRusfmDcb",
+          "name": "Bearer Auth Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "financeiro@ikasaconsultoria.com.br",
+        "toEmail": "=\"{{ $node[\"formated_return\"].json.email }}\"",
+        "subject": "Assunto",
+        "html": "<html>\n<body style=\"color: red;\"> Olá novamenre </body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        -64
+      ],
+      "id": "1d592ae5-3498-44d4-934e-20ade60015e5",
+      "name": "Send email",
+      "webhookId": "e5cec353-15d2-400c-9c66-eb56cf98772d",
+      "credentials": {
+        "smtp": {
+          "id": "a4YPmFiriqiizUwe",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "items_count_equal_zero",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crm_status_is_saved": {
+      "main": [
+        [
+          {
+            "node": "add_funnel_4c",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "save_customer_4c",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_funnel_4c": {
+      "main": [
+        [
+          {
+            "node": "update_db_crm_status_added_funnel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formated_return": {
+      "main": [
+        [
+          {
+            "node": "crm_status_is_saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "items_count_equal_zero": {
+      "main": [
+        [],
+        [
+          {
+            "node": "formated_return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save_customer_4c": {
+      "main": [
+        [
+          {
+            "node": "update_db_crm_status_saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_db_crm_status_added_funnel": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9c3a9b73-ee34-4d9c-9711-a4e434ab2711",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e4442d4cbb958ef5079844d78dab3976113d66fc540c833ac10dd7eebbbb8a36"
+  },
+  "id": "jaGaWxvlYczaoqhu",
+  "tags": []
+}
