@@ -28,6 +28,7 @@ const fetchAndProcessLeads = new FetchAndProcessLeads(
 
 async function run() {
     console.log(`[${new Date().toISOString()}] Job started.`);
+
     try {
         await fetchAndProcessLeads.execute();
         console.log(`[${new Date().toISOString()}] Job completed successfully.`);

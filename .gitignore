@@ -1,5 +1,6 @@
 .env
-.vscode
+#.vscode
+.log
 
 package-lock.json
 

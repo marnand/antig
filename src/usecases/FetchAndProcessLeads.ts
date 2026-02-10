@@ -2,6 +2,7 @@ import { SupabaseService } from '../services/SupabaseService';
 import { CnpjaService } from '../services/CnpjaService';
 import { ProcessUnprocessedLeads } from './ProcessUnprocessedLeads';
 import { formatCnpjaResponse } from '../utils/formatters';
+import { saveLog } from '../utils/saveLog';
 
 export class FetchAndProcessLeads {
     constructor(
@@ -37,7 +38,7 @@ export class FetchAndProcessLeads {
 
                 // We pass the formatted leads to the processor. 
                 // NOTE: The processor expects them to be in the interface format.
-                await this.processor.execute(formattedLeads);
+                //await this.processor.execute(formattedLeads);
             }
         } else {
             console.log('DB is not empty. Checking for unprocessed items...');
